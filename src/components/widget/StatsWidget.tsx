@@ -179,7 +179,7 @@ export const StatsWidget = ({ data }: { data: BlogStats }) => {
                     transition-all duration-300
                     hover:shadow-white/20"
                 >
-                  <span className="relative z-10">会员价格</span>
+                  <span className="relative z-10">查看会员价格</span>
                   <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-black/10 to-transparent -translate-x-full group-hover/btn:animate-shimmer z-0 pointer-events-none"></div>
                 </button>
 
