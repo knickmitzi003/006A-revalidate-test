@@ -21,7 +21,7 @@ export const StatsWidget = ({ data }: { data: any }) => {
   const title = post.title || '暂无公告';
   
   // 获取摘要：优先 summary，其次 excerpt
-  const summary = post.summary || post.excerpt || '请在 Notion 中添加 Slug 为 announcement 的 Widget 类型文章...';
+  const summary = post.summary || post.excerpt || '暂无公告';
   
   // 获取链接
   const slug = post.slug ? `/post/${post.slug}` : null;
