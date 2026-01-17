@@ -17,11 +17,13 @@ type _Array<N extends number, T, R extends unknown[]> = R['length'] extends N
   ? R
   : _Array<N, T, [T, ...R]>
 
+// ✨ 关键修改 1：注册 Announcement 类型
 export enum ContentType {
   Post = 'Post',
   Page = 'Page',
   Piece = 'Piece',
   Widget = 'Widget',
+  Announcement = 'Announcement', // 👈 新增这一行
 }
 
 export type NextPageWithLayout = NextPage & {
@@ -96,6 +98,9 @@ export type Post = {
     originalCover: boolean
     repost: string
   }
+  // ✨ 关键修改 2：虽然通常不需要显式声明 type 字段（因为它是运行时判断），
+  // 但为了兼容某些过滤逻辑，我们可以让 Post 类型包含 type 信息
+  type?: ContentType 
 }
 
 export type Tag = {
