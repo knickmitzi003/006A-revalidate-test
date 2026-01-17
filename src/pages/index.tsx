@@ -24,7 +24,7 @@ const Home: NextPage<{
   return (
     <>
       <ContainerLayout>
-        {/* widgets 已经包含了我们注入的 announcement */}
+        {/* WidgetCollection 会接收到我们注入的 announcement */}
         <WidgetCollection widgets={widgets} />
         <div data-aos="fade-up" data-aos-delay={300}>
           <MainPostsCollection posts={posts} />
@@ -41,39 +41,35 @@ export const getStaticProps: GetStaticProps = withNavFooterStaticProps(
     sharedPageStaticProps: SharedNavFooterStaticProps
   ) => {
     const { LARGE, MEDIUM, SMALL, MORE } = CONFIG.HOME_POSTS_COUNT
-    const sum = LARGE + MEDIUM + SMALL + MORE
+    // 💡 关键：多抓取 5 篇，防止公告文章把首页填满导致普通文章不够
+    const sum = LARGE + MEDIUM + SMALL + MORE + 5
 
-    // 1. 获取普通文章列表 (Post)
-    const posts = await getLimitPosts(sum, ApiScope.Home)
-    const formattedPosts = await formatPosts(posts)
+    // 1. 获取所有文章 (Type = Post)
+    const postsRaw = await getLimitPosts(sum, ApiScope.Home)
+    const allFormattedPosts = await formatPosts(postsRaw)
 
-    // 2. 获取统计数据
+    // --- 🔥 核心修复逻辑 ---
+    
+    // A. 拦截：找到 Slug 为 'announcement' 的文章
+    const announcementPost = allFormattedPosts.find(p => p.slug === 'announcement') || null
+
+    // B. 过滤：从主列表里剔除这篇公告 (防止它重复出现在下方的文章流里)
+    const filteredPosts = allFormattedPosts.filter(p => p.slug !== 'announcement')
+
+    // 2. 获取统计数据和普通组件
     const blogStats = await getBlogStats()
-    
-    // 3. 获取所有 Widget 类型的页面 (用于 Profile 等)
     const rawWidgets = await getWidgets()
-
-    // --- 🔥 核心修复：直接从 sharedPageStaticProps 获取全局页面数据 ---
-    // 不需要额外 import getGlobalData，因为它已经传进来了
-    // 使用 (as any) 绕过类型检查，直接读取 allNavPages
-    const allPages = (sharedPageStaticProps?.props as any)?.allNavPages || []
-    
-    // 在所有 Page 中查找 slug 为 'announcement' 的页面
-    const announcementData = allPages.find((p: any) => p.slug === 'announcement')
-    // ----------------------------------------------------
-
-    // 4. 执行原有的 Widget 格式化流程
     const preFormattedWidgets = await preFormatWidgets(rawWidgets)
     const formattedWidgets = await formatWidgets(preFormattedWidgets, blogStats)
 
-    // 5. 将找到的公告数据注入到最终对象中
-    // 即使没找到，也传 null，防止组件报错
-    ;(formattedWidgets as any).announcement = announcementData || null
+    // 3. 注入：把拦截下来的公告塞给 widgets 对象
+    ;(formattedWidgets as any).announcement = announcementPost
 
     return {
       props: {
         ...sharedPageStaticProps.props,
-        posts: formattedPosts,
+        // 这里返回过滤后的文章列表
+        posts: filteredPosts.slice(0, sum - 5), 
         widgets: formattedWidgets,
       },
       // revalidate: CONFIG.NEXT_REVALIDATE_SECONDS,
