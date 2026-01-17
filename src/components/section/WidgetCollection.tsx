@@ -11,11 +11,17 @@ export const WidgetCollection = ({
       className="mb-6 grid grid-cols-2 gap-4 md:gap-8 lg:gap-10"
       data-aos="fade-up"
     >
-      {/* 左侧：Profile 组件 (保持不变) */}
+      {/* 左侧：Profile 组件 */}
       <ProfileWidget data={widgets.profile} />
       
-      {/* 右侧：Stats 组件 (改为接收 announcement 数据) */}
-      {/* ⚠️ 注意：确保你在 Notion 中有一篇文章的 Slug 设置为了 'announcement' (或者 'annoucement'，请检查你的拼写) */}
+      {/* 右侧：公告板 (原 StatsWidget) */}
+      {/* 
+         只要你在 Notion 数据库中有一篇文章：
+         Type = Widget
+         Slug = announcement
+         Status = Published
+         它就会自动出现在 widgets 对象中
+      */}
       <StatsWidget data={widgets.announcement} />
     </div>
   )
