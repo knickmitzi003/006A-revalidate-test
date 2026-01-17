@@ -11,19 +11,14 @@ export const StatsWidget = ({ data }: { data: any }) => {
   const [showModal, setShowModal] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [imgError, setImgError] = useState(false) // 新增：控制图片加载失败的状态
 
   // 1. 数据解析
   const post = data || {};
   
-  // 📸 核心修复：图片取值顺序调整
-  // NotionNext 格式化后通常把有效图片放在 pageCover 中
-  const coverSrc = post.pageCover || post.pageCoverThumbnail || post.cover || ''; 
+  // 🚫 移除封面读取逻辑，不再处理 cover
   
   const title = post.title || '暂无公告';
   const summary = post.summary || post.excerpt || '暂无详细内容...';
-  
-  // 🔗 核心修复：强制加上 /post/ 前缀
   const slug = post.slug ? `/post/${post.slug}` : null;
 
   useEffect(() => {
@@ -45,26 +40,92 @@ export const StatsWidget = ({ data }: { data: any }) => {
     return () => { document.body.style.overflow = 'unset' }
   }, [showModal])
 
-  // --- 弹窗组件 ---
+  // --- 💎 升级版弹窗组件 (高级质感) ---
   const Modal = () => {
     if (!mounted) return null
     // @ts-ignore
     return createPortal(
       <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
         <style jsx>{`
-          @keyframes modalEnter { 0% { opacity: 0; transform: scale(0.95) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
-          .animate-modal-enter { animation: modalEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+          @keyframes modalEnter { 
+            0% { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(10px); } 
+            100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); } 
+          }
+          .animate-modal-enter { animation: modalEnter 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+          .glass-shine {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.02) 100%);
+          }
         `}</style>
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity" onClick={() => setShowModal(false)}></div>
-        <div className="relative z-10 w-full max-w-[260px] overflow-hidden rounded-2xl animate-modal-enter bg-[#1c1c1e]/90 backdrop-blur-xl border border-white/10 shadow-2xl text-center p-6">
-          <h3 className="text-base font-bold text-white mb-4 tracking-wide">站长 ID</h3>
-          <div onClick={handleCopy} className="group relative cursor-pointer p-3 bg-black/50 rounded-xl border border-white/5 hover:border-blue-500/50 transition-all active:scale-95">
-            <span className="text-xl font-mono font-bold text-white tracking-wider">{SHOP_CODE}</span>
-            <div className={`absolute inset-0 flex items-center justify-center rounded-xl bg-blue-600 transition-all duration-200 ${isCopied ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-              <span className="text-xs font-bold text-white">已复制 ✅</span>
+
+        {/* 1. 遮罩层：加深黑色，突出主体 */}
+        <div 
+          className="absolute inset-0 bg-[#000000]/80 backdrop-blur-md transition-opacity duration-500"
+          onClick={() => setShowModal(false)}
+        ></div>
+        
+        {/* 2. 弹窗主体：全息玻璃质感 */}
+        <div className="relative z-10 w-full max-w-[320px] rounded-[2rem] overflow-hidden animate-modal-enter shadow-[0_0_50px_-10px_rgba(124,58,237,0.3)]">
+          
+          {/* 背景构造 */}
+          <div className="absolute inset-0 bg-[#121212]/90 backdrop-blur-3xl"></div>
+          {/* 顶部微光 */}
+          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-purple-400/50 to-transparent"></div>
+          {/* 底部反光 */}
+          <div className="absolute bottom-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+          
+          {/* 内容容器 */}
+          <div className="relative p-8 flex flex-col items-center glass-shine">
+            
+            {/* 图标：使用发光背景 */}
+            <div className="mb-5 w-14 h-14 rounded-full bg-gradient-to-br from-purple-900/50 to-blue-900/50 flex items-center justify-center border border-white/10 shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+              <span className="text-2xl">🆔</span>
             </div>
+
+            <h3 className="text-xl font-extrabold text-white mb-2 tracking-wide text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-400">
+              站长身份码
+            </h3>
+            <p className="text-xs text-gray-400 mb-8 text-center leading-relaxed font-medium">
+              点击下方卡片即可一键复制<br/>用于身份验证或联系
+            </p>
+            
+            {/* 编号显示区：增加凹陷感和内发光 */}
+            <div 
+              onClick={handleCopy}
+              className="group relative w-full cursor-pointer mb-8 p-4 bg-black/40 rounded-2xl border border-white/5 
+                shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] 
+                hover:border-purple-500/30 hover:shadow-[inset_0_2px_20px_rgba(139,92,246,0.1)] 
+                transition-all duration-300"
+            >
+              <div className="text-center">
+                <span className="text-2xl font-mono font-black text-gray-200 tracking-[0.15em] group-hover:text-white transition-colors">
+                  {SHOP_CODE}
+                </span>
+              </div>
+              
+              {/* 复制反馈遮罩 */}
+              <div className={`
+                absolute inset-0 flex items-center justify-center rounded-2xl 
+                bg-purple-600/90 backdrop-blur-sm
+                transition-all duration-300 
+                ${isCopied ? 'opacity-100 visible scale-100' : 'opacity-0 invisible scale-95'}
+              `}>
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                  复制成功
+                </span>
+              </div>
+            </div>
+
+            {/* 底部按钮 */}
+            <button
+              type="button"
+              className="w-full py-3 rounded-xl bg-white text-black text-xs font-bold tracking-wide hover:bg-gray-200 active:scale-95 transition-all shadow-lg"
+              onClick={() => setShowModal(false)}
+            >
+              关闭窗口
+            </button>
+
           </div>
-          <button className="mt-5 w-full py-2 rounded-lg bg-white text-black text-xs font-bold hover:bg-gray-200 transition-colors" onClick={() => setShowModal(false)}>关闭</button>
         </div>
       </div>,
       document.body
@@ -96,23 +157,22 @@ export const StatsWidget = ({ data }: { data: any }) => {
         {/* 主体容器 */}
         <div className="relative h-full w-full overflow-hidden rounded-3xl border border-white/10 shadow-2xl bg-[#151516] flex flex-col">
           
-          {/* ================= 背景图层 (智能兜底版) ================= */}
+          {/* ================= 背景图层 (纯色流光版) ================= */}
+          {/* 🚫 移除了图片逻辑，强制使用 CSS 背景 */}
           <div className="absolute inset-0 z-0">
-            {coverSrc && !imgError ? (
-              <img 
-                src={coverSrc} 
-                alt={title} 
-                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-110 opacity-90"
-                // ⚠️ 关键修复：如果图片加载失败，自动切换 imgError 状态，触发下方的兜底背景
-                onError={() => setImgError(true)}
-              />
-            ) : (
-              // 兜底背景：当没有图片 或 图片挂了 时显示
-              <div className="w-full h-full bg-gradient-to-br from-indigo-900 to-purple-900">
-                 <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-[40px]"></div>
-              </div>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/20"></div>
+             {/* 深邃背景 */}
+             <div className="w-full h-full bg-gradient-to-br from-[#2e1065] via-[#1e1b4b] to-black">
+                 {/* 动态光斑装饰 - 增加右上角紫色光晕 */}
+                 <div className="absolute top-[-20%] right-[-20%] w-[80%] h-[80%] bg-purple-600/20 rounded-full blur-[80px]"></div>
+                 {/* 动态光斑装饰 - 增加左下角蓝色光晕 */}
+                 <div className="absolute bottom-[-20%] left-[-20%] w-[60%] h-[60%] bg-blue-600/10 rounded-full blur-[60px]"></div>
+             </div>
+             
+             {/* 纹理遮罩，增加质感 */}
+             <div className="absolute inset-0 opacity-20" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
+             
+             {/* 底部黑色渐变，保证文字清晰 */}
+             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
           </div>
 
           {/* ================= 内容层 ================= */}
@@ -122,11 +182,11 @@ export const StatsWidget = ({ data }: { data: any }) => {
             {/* @ts-ignore */}
             <Wrapper {...wrapperProps}>
                <div className="mb-2 flex items-center gap-1.5 opacity-90">
-                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
                  <span className="text-[10px] font-bold text-white/80 tracking-widest uppercase">公告</span>
                </div>
 
-               <h2 className="text-xl md:text-2xl font-extrabold text-white leading-tight tracking-tight mb-2 group-hover/text:text-purple-300 transition-colors line-clamp-2">
+               <h2 className="text-xl md:text-2xl font-extrabold text-white leading-tight tracking-tight mb-2 group-hover/text:text-purple-300 transition-colors line-clamp-2 drop-shadow-md">
                  {title}
                </h2>
 
@@ -148,7 +208,8 @@ export const StatsWidget = ({ data }: { data: any }) => {
                   bg-white/10 backdrop-blur-md border border-white/10
                   text-xs font-bold text-white tracking-wide
                   transition-all duration-300
-                  hover:bg-white/20 hover:scale-[1.02] active:scale-95 active:bg-white/5"
+                  hover:bg-white/20 hover:scale-[1.02] active:scale-95 active:bg-white/5
+                  shadow-lg"
               >
                 <span className="text-sm">🆔</span>
                 <span>站长 ID</span>
