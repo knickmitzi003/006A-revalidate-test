@@ -11,15 +11,11 @@ const withPWA = require('next-pwa')({
 const nextConfig = {
     reactStrictMode: true,
     
-    // 1. 超时时间：给足 5 分钟，防止 Notion 响应慢
+    // 保持 5 分钟超时，这对连接 Notion 很重要
     staticPageGenerationTimeout: 300,
 
-    // 2.【关键新增】试图限制构建时的并发数
-    // 这能减少同时下载图片的数量，降低 "VipsJpeg" 报错的概率
-    experimental: {
-        workerThreads: false, // 禁用工作线程，降低并行度
-        cpus: 1, // 强制只使用 1 个 CPU 核心（让它排队一个一个处理，而不是一窝蜂下载）
-    },
+    // ⚠️ 删除了 experimental 的 CPU 限制，回归默认并发
+    // Cloudflare 环境下有时候限制太死反而会崩溃
 
     webpack(config) {
         config.module.rules.push({
@@ -30,6 +26,7 @@ const nextConfig = {
     },
     images: {
         formats: ['image/avif', 'image/webp'],
+        // 允许的域名列表保持不变
         domains: ['001.blogimage.top', 'x1file.top', '003.blogimage.top', '004.blogimage.top', '005.blogimage.top', 'qpic.ws', 'upload.cc', 'x1image.top', 'www.imgccc.com', 'static.anzifan.com', 'cdn.sspai.com', 'cdn.dribbble.com', 'image.freepik.com', 'avatars.githubusercontent.com', 'cdn.jsdelivr.net', 'images.unsplash.com',
                  'img.notionusercontent.com',
                 'gravatar.com',
@@ -48,10 +45,11 @@ const nextConfig = {
                 hostname: '*.amazonaws.com',
             },
         ],
-        unoptimized: true,
+        // 保持禁用优化，这是解决 VipsJpeg 问题的关键
+        unoptimized: true, 
     },
-    output: 'export',
-    trailingSlash: true,
+    output: 'export', 
+    trailingSlash: true, 
 }
 
 module.exports = withPWA(nextConfig);
