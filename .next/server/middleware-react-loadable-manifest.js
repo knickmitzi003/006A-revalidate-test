@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST={"admin.js -> ../components/AdminSystem/AdminDashboard":{"id":"admin.js -> ../components/AdminSystem/AdminDashboard","files":["static/chunks/src_components_AdminSystem_AdminDashboard_js.js"]}}
