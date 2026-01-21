@@ -8,7 +8,7 @@ const n2m = new NotionToMarkdown({ notionClient: notion });
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// === 1. 强力解析器 (保留：链接自动转图片) ===
+// === 1. 强力解析器 (保留链接转图片功能) ===
 function parseLinesToChildren(text) {
   const lines = text.split(/\r?\n/);
   const blocks = [];
@@ -17,8 +17,8 @@ function parseLinesToChildren(text) {
     const trimmed = line.trim();
     if (!trimmed) continue;
 
-    // A. 媒体识别
-    const mdMatch = trimmed.match(/(?:!|)?\[.*?\]\((.*?)\)/);
+    // 媒体识别
+    const mdMatch = trimmed.match(/^!\[.*?\]\((.*?)\)$/) || trimmed.match(/^\[.*?\]\((.*?)\)$/);
     let potentialUrl = mdMatch ? mdMatch[1] : trimmed;
     const urlMatch = potentialUrl.match(/https?:\/\/[^\s)\]"]+/);
     const cleanUrl = urlMatch ? urlMatch[0] : null;
@@ -30,19 +30,14 @@ function parseLinesToChildren(text) {
       continue;
     }
 
-    // B. 标题识别
     if (trimmed.startsWith('# ')) { blocks.push({ object: 'block', type: 'heading_1', heading_1: { rich_text: [{ text: { content: trimmed.replace('# ', '') } }] } }); continue; } 
-    
-    // C. 注释块识别
     if (trimmed.startsWith('`') && trimmed.endsWith('`') && trimmed.length > 1) { blocks.push({ object: 'block', type: 'paragraph', paragraph: { rich_text: [{ text: { content: trimmed.slice(1, -1) }, annotations: { code: true, color: 'red' } }] } }); continue; }
-    
-    // D. 普通文本
     blocks.push({ object: 'block', type: 'paragraph', paragraph: { rich_text: [{ text: { content: trimmed } }] } });
   }
   return blocks;
 }
 
-// === 2. 积木转换器 (写入时逻辑) ===
+// === 2. 积木转换器 (写入时的状态机) ===
 function mdToBlocks(markdown) {
   if (!markdown) return [];
   const rawChunks = markdown.split(/\n{2,}/);
@@ -83,31 +78,44 @@ export default async function handler(req, res) {
   const databaseId = process.env.NOTION_DATABASE_ID || process.env.NOTION_PAGE_ID;
 
   try {
-    // === GET: 获取详情 (读取时逻辑) ===
+    // === GET: 获取详情 (核心修复：二次编辑回显逻辑) ===
     if (req.method === 'GET') {
       const page = await notion.pages.retrieve({ page_id: id });
       const mdblocks = await n2m.pageToMarkdown(id);
       
-      // 🟢 核心修复：更强的正则，匹配 Notion 返回的 **LOCK:123**
-      mdblocks.forEach(b => {
+      // 🛡️ 防御性编程：确保 mdblocks 是数组
+      const safeMdBlocks = Array.isArray(mdblocks) ? mdblocks : [];
+
+      safeMdBlocks.forEach(b => {
+        // 检测到是加密 Callout 块
         if (b.type === 'callout' && b.parent && b.parent.includes('LOCK:')) {
-          // 兼容 LOCK:123 和 **LOCK:123**
-          const pwdMatch = b.parent.match(/LOCK:(.*?)(?:\*\*|__)?(\n|$)/);
-          const pwd = pwdMatch ? pwdMatch[1].trim() : '';
+          // 1. 提取密码
+          const pwdMatch = b.parent.match(/LOCK:(.*?)(\n|$|\*)/); // 兼容 **LOCK:1**
+          const pwd = pwdMatch ? pwdMatch[1].replace(/\*/g, '').trim() : '';
+
+          // 2. 提取并清洗正文 (这是防止炸裂的关键！)
+          // NotionToMD 返回的 parent 格式通常是:
+          // > 🔒 **LOCK:1**
+          // > 
+          // > 正文内容...
           
-          const parts = b.parent.split('---');
-          let body = parts.length > 1 ? parts.slice(1).join('---') : b.parent.replace(/LOCK:.*\n?/, '');
-          // 清理引用符号
-          body = body.replace(/^> ?/gm, '').trim(); 
-          // 还原为 :::lock 格式，这样前端就不会炸裂了
-          b.parent = `:::lock ${pwd}\n\n${body}\n\n:::`; 
+          const lines = b.parent.split('\n');
+          // 去掉第一行(标题行)
+          lines.shift(); 
+          
+          // 逐行清洗 '> ' 前缀
+          const cleanBody = lines.map(line => {
+             return line.replace(/^> ?/, ''); 
+          }).join('\n').trim();
+
+          // 3. 重组为标准积木格式
+          b.parent = `:::lock ${pwd}\n\n${cleanBody}\n\n:::`; 
         }
       });
 
-      const mdStringObj = n2m.toMarkdownString(mdblocks);
+      const mdStringObj = n2m.toMarkdownString(safeMdBlocks);
       const cleanContent = mdStringObj.parent ? mdStringObj.parent.trim() : '';
       const p = page.properties;
-      
       let rawBlocks = [];
       try { const blocksRes = await notion.blocks.children.list({ block_id: id }); rawBlocks = blocksRes.results; } catch (e) {}
 
@@ -124,13 +132,13 @@ export default async function handler(req, res) {
           type: p.type?.select?.name || 'Post',
           date: p.date?.date?.start || '',
           cover: p.cover?.url || p.cover?.file?.url || p.cover?.external?.url || '',
-          content: cleanContent,
+          content: cleanContent, // 现在的 content 里已经是干净的 :::lock 了
           rawBlocks: rawBlocks
         }
       });
     }
 
-    // === POST: 保存 ===
+    // === POST: 极速写入 ===
     if (req.method === 'POST') {
       const body = JSON.parse(req.body);
       const { id, title, content, slug, excerpt, category, tags, status, date, type, cover } = body;

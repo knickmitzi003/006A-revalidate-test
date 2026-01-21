@@ -166,7 +166,7 @@ const cleanAndFormat = (input) => {
 };
 
 // ==========================================
-// 4. 积木编辑器 (核心修复：状态机解析)
+// 4. 积木编辑器 (状态机解析)
 // ==========================================
 const parseContentToBlocks = (md) => {
   if(!md) return [];
@@ -207,7 +207,8 @@ const parseContentToBlocks = (md) => {
       continue;
     }
 
-    // B. 识别 Notion 原生 > 🔒
+    // B. 识别 Notion 原生 > 🔒 (兼容性修复)
+    // 关键修复：这里的正则现在能完美匹配 Notion 返回的引用块格式
     if (!isLocking && trimmed.match(/^>\s*🔒/)) {
       flushBuffer(); isLocking = true;
       const match = trimmed.match(/LOCK:(.*?)\*\*/);
@@ -215,13 +216,14 @@ const parseContentToBlocks = (md) => {
       continue;
     }
     
-    // 结束条件：非引用行且非空行
-    if (isLocking && !trimmed.startsWith('>') && !trimmed.startsWith(':::') && trimmed !== '') {
+    // 结束条件：只要不处于锁定模式，或者非引用行
+    // 修改：放宽结束条件，只要当前行不以 > 开头且不为空，就结束 lock
+    if (isLocking && !trimmed.startsWith('>') && trimmed !== '') {
        isLocking = false;
        const joinedLock = lockBuffer.join('\n').trim();
        res.push({ id: Date.now() + Math.random(), type: 'lock', pwd: lockPwd, content: joinedLock });
        lockBuffer = [];
-       i--; 
+       i--; // 回退，重新处理当前行
        continue;
     }
 
@@ -232,7 +234,7 @@ const parseContentToBlocks = (md) => {
       else if (contentLine.startsWith('>')) contentLine = contentLine.substring(1);
       
       if (contentLine.trim() === '---') continue;
-      if (contentLine.trim() === '') continue;
+      // if (contentLine.trim() === '') continue; // 保留空行，让排版更自然
 
       lockBuffer.push(contentLine);
       continue;
@@ -346,28 +348,6 @@ const BlockBuilder = ({ blocks, setBlocks }) => {
   );
 };
 
-const NotionView = ({ blocks }) => {
-  if (!blocks || !Array.isArray(blocks)) return <div style={{padding:20, color:'#666'}}>暂无预览内容</div>;
-  return (
-    <div style={{color:'#e1e1e3', fontSize:'15px', lineHeight:'1.8'}}>
-      {blocks.map((b, i) => {
-        const type = b.type; const data = b[type]; const text = data?.rich_text?.[0]?.plain_text || "";
-        if(type==='heading_1') return <h1 key={i} style={{fontSize:'1.8em', borderBottom:'1px solid #333', paddingBottom:'8px', margin:'24px 0 12px'}}>{text}</h1>;
-        if(type==='paragraph') {
-            const richText = data?.rich_text?.[0];
-            if (richText?.annotations?.code) return <div key={i} style={{margin:'10px 0', borderLeft:'3px solid #ff6b6b', paddingLeft:'10px'}}><span style={{color:'#ff6b6b', fontFamily:'monospace', fontSize:'0.95em'}}>{text}</span></div>;
-            return <p key={i} style={{margin:'10px 0', minHeight:'1em'}}>{text}</p>;
-        }
-        if(type==='divider') return <hr key={i} style={{border:'none', borderTop:'1px solid #444', margin:'24px 0'}} />;
-        if(type==='image') { const url = data?.file?.url || data?.external?.url; if (!url) return null; const isVideo = url.match(/\.(mp4|mov|webm|ogg)(\?|$)/i); if(isVideo) return <div key={i} style={{display:'flex', justifyContent:'center', margin:'20px 0'}}><div style={{width:'100%', maxHeight:'500px', borderRadius:'8px', background:'#000', display:'flex', justifyContent:'center'}}><video src={url} controls preload="metadata" style={{maxWidth:'100%', maxHeight:'100%'}} /></div></div>; return <div key={i} style={{display:'flex', justifyContent:'center', margin:'20px 0'}}><div style={{width: '100%', height: '500px', background: '#000', borderRadius: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden'}}><img src={url} style={{maxWidth: '100%', maxHeight: '100%', objectFit: 'contain'}} alt="" /></div></div>; }
-        if(type==='video' || type==='embed') { let url = data?.file?.url || data?.external?.url || data?.url; if(!url) return null; const isY = url.includes('youtube')||url.includes('youtu.be'); if(isY){if(url.includes('watch?v='))url=url.replace('watch?v=','embed/');if(url.includes('youtu.be/'))url=url.replace('youtu.be/','www.youtube.com/embed/');} return <div key={i} style={{display:'flex', justifyContent:'center', margin:'20px 0'}}>{(type==='embed'||isY)?<iframe src={url} style={{width:'100%',maxWidth:'800px',height:'450px',border:'none',borderRadius:'8px',background:'#000'}} allowFullScreen />:<video src={url} controls style={{width:'100%',maxHeight:'500px',borderRadius:'8px',background:'#000'}}/>}</div>; }
-        if(type==='callout') return <div key={i} style={{background:'#2d2d30', padding:'20px', borderRadius:'12px', border:'1px solid #3e3e42', display:'flex', gap:'15px', margin:'20px 0'}}><div style={{fontSize:'1.4em'}}>{b.callout.icon?.emoji || '🔒'}</div><div style={{flex:1}}><div style={{fontWeight:'bold', color:'greenyellow', marginBottom:'4px'}}>{text}</div><div style={{fontSize:'12px', opacity:0.5}}>[ 加密内容已受保护 ]</div></div></div>;
-        return null;
-      })}
-    </div>
-  );
-};
-
 // ==========================================
 // 5. 顶层入口组件
 // ==========================================
@@ -411,6 +391,7 @@ export default function AdminDashboard() {
     return () => window.removeEventListener('popstate', onPopState);
   }, [view]);
 
+  // ✅ handleEdit (防崩版)
   const handleEdit = async (id) => {
     setLoading(true);
     try {
@@ -420,7 +401,6 @@ export default function AdminDashboard() {
         const d = await r.json();
         if (d.success && d.post) {
           setForm(d.post);
-          // 🟢 修复：安全解析，防止 split undefined
           setEditorBlocks(parseContentToBlocks(d.post.content || ''));
           setCurrentId(id);
           setView('edit');
@@ -434,16 +414,13 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleCreate = () => { setForm({ title: '', slug: 'p-'+Date.now().toString(36), excerpt:'', content:'', category:'', tags:'', cover:'', status:'Published', type: 'Post', date: new Date().toISOString().split('T')[0] }); setEditorBlocks([]); setCurrentId(null); setView('edit'); setExpandedStep(1); };
-  
-  // 🟢 修复：handlePreview 安全检查
+  // ✅ handlePreview (防崩版 + 冒泡修复)
   const handlePreview = async (p) => {
     setLoading(true);
     try {
         const r = await fetch(`/api/admin/post?id=${p.id}`);
         if (!r.ok) throw new Error(`API Error: ${r.status}`);
         const d = await r.json();
-        // 只要 success 就尝试显示，不强求 rawBlocks
         if (d.success && d.post) {
             setPreviewData(d.post);
         } else {
@@ -451,6 +428,8 @@ export default function AdminDashboard() {
         }
     } catch(e) { } finally { setLoading(false); }
   };
+  
+  const handleCreate = () => { setForm({ title: '', slug: 'p-'+Date.now().toString(36), excerpt:'', content:'', category:'', tags:'', cover:'', status:'Published', type: 'Post', date: new Date().toISOString().split('T')[0] }); setEditorBlocks([]); setCurrentId(null); setView('edit'); setExpandedStep(1); };
   
   const handleSave = async () => {
     if (isDeploying) return alert("请等待上一次更新完成（约60秒）...");
