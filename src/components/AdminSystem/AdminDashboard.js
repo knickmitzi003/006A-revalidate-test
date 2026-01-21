@@ -1,27 +1,31 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 
-// ================= 1. 图标库 =================
+// ==========================================
+// 1. 图标库
+// ==========================================
 const Icons = {
   Search: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
+  CoverMode: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>,
+  TextMode: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>,
+  GridMode: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>,
+  FolderMode: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>,
+  FolderIcon: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff" style={{opacity:0.8}}><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"></path></svg>,
   Edit: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg>,
   Trash: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
-  Settings: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
+  Tutorial: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>,
+  ChevronDown: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>,
   ArrowUp: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>,
   ArrowDown: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>,
   Top: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="18 11 12 5 6 11"></polyline><polyline points="18 18 12 12 6 18"></polyline></svg>,
   Bottom: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 6 12 12 18 6"></polyline><polyline points="6 13 12 19 18 13"></polyline></svg>,
-  FolderIcon: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff" style={{opacity:0.8}}><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"></path></svg>,
-  ChevronDown: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>,
-  Refresh: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>,
-  Tutorial: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>,
-  FolderMode: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>,
-  CoverMode: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>,
-  TextMode: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>,
-  GridMode: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>,
+  Settings: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
+  Refresh: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
 };
 
-// ================= 2. 样式 & 辅助组件 =================
+// ==========================================
+// 2. 样式表 (内置防止 Global CSS 报错)
+// ==========================================
 const GlobalStyle = () => (
   <style dangerouslySetInnerHTML={{__html: `
     body { background-color: #303030; color: #ffffff; margin: 0; font-family: system-ui, sans-serif; overflow-x: hidden; }
@@ -87,8 +91,7 @@ const GlobalStyle = () => (
     .input:active { transform: scale(0.95); }
     .input:focus { box-shadow: 0 0 0 2.5px #2f303d; }
     .search-icon { position: absolute; left: 1rem; fill: #bdbecb; width: 1rem; height: 1rem; pointer-events: none; z-index: 1; }
-    /* 🟢 修复悬浮按钮位置：底部距离改为 120px，避开客服组件 */
-    .fab-scroll { position: fixed; right: 30px; bottom: 120px; display: flex; flex-direction: column; gap: 10px; z-index: 99; }
+    .fab-scroll { position: fixed; right: 30px; bottom: 30px; display: flex; flex-direction: column; gap: 10px; z-index: 99; }
     .fab-btn { width: 45px; height: 45px; background: greenyellow; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; transition: 0.2s; }
     .fab-btn:hover { transform: scale(1.1); box-shadow: 0 6px 16px rgba(173, 255, 47, 0.4); }
     .btn-disabled { opacity: 0.5; cursor: not-allowed; }
@@ -99,6 +102,9 @@ const GlobalStyle = () => (
   `}} />
 );
 
+// ==========================================
+// 3. 辅助组件
+// ==========================================
 const SearchInput = ({ value, onChange }) => (
   <div className="group">
     <svg className="search-icon" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
@@ -166,9 +172,6 @@ const cleanAndFormat = (input) => {
   } catch (e) { return input; }
 };
 
-// ==========================================
-// 3. 积木编辑器 (状态机逻辑)
-// ==========================================
 const BlockBuilder = ({ blocks, setBlocks }) => {
   const [movingId, setMovingId] = useState(null);
 
@@ -291,25 +294,14 @@ const NotionView = ({ blocks }) => {
 // ==========================================
 export default function AdminDashboard() {
   const [mounted, setMounted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [view, setView] = useState('list');
-  const [posts, setPosts] = useState([]);
-  const [options, setOptions] = useState({ categories: [], tags: [] });
-  const [activeTab, setActiveTab] = useState('Post');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showAllTags, setShowAllTags] = useState(false);
-  const [selectedFolder, setSelectedFolder] = useState(null);
-  const [previewData, setPreviewData] = useState(null);
-  
-  // 编辑器状态
-  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', content: '', category: '', tags: '', cover: '', status: 'Published', type: 'Post', date: '' });
-  const [currentId, setCurrentId] = useState(null);
+  const [view, setView] = useState('list'), [viewMode, setViewMode] = useState('covered'), [posts, setPosts] = useState([]), [options, setOptions] = useState({ categories: [], tags: [] }), [loading, setLoading] = useState(false), [activeTab, setActiveTab] = useState('Post'), [searchQuery, setSearchQuery] = useState(''), [showAllTags, setShowAllTags] = useState(false), [selectedFolder, setSelectedFolder] = useState(null), [previewData, setPreviewData] = useState(null);
+  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', content: '', category: '', tags: '', cover: '', status: 'Published', type: 'Post', date: '' }), [currentId, setCurrentId] = useState(null);
   const [siteTitle, setSiteTitle] = useState('PROBLOG');
   const [navIdx, setNavIdx] = useState(1); 
   const [expandedStep, setExpandedStep] = useState(1);
   const [editorBlocks, setEditorBlocks] = useState([]);
   
-  // 🟢 防抖状态锁
+  // 🟢 新增：防抖状态锁
   const [isDeploying, setIsDeploying] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
@@ -322,14 +314,8 @@ export default function AdminDashboard() {
        if(!r.ok) throw new Error('API Error');
        const d = await r.json(); 
        if (d.success) { setPosts(d.posts || []); setOptions(d.options || { categories: [], tags: [] }); }
-       
-       const rConf = await fetch('/api/admin/config');
-       if (rConf.ok) {
-           const dConf = await rConf.json(); 
-           if (dConf.success && dConf.siteInfo) setSiteTitle(dConf.siteInfo.title);
-       }
-    } catch(e) { console.warn(e); } 
-    finally { setLoading(false); } 
+       const rConf = await fetch('/api/admin/config'); const dConf = await rConf.json(); if (dConf.success) setSiteTitle(dConf.siteInfo.title);
+    } catch(e) {} finally { setLoading(false); } 
   }
   useEffect(() => { if (mounted) fetchPosts(); }, [mounted]);
 
@@ -345,7 +331,40 @@ export default function AdminDashboard() {
     return () => window.removeEventListener('popstate', onPopState);
   }, [view]);
 
-  // 🟢 核心修复：状态机解析逻辑 (解决二次编辑炸裂)
+  const updateSiteTitle = async () => {
+    const newTitle = prompt("请输入新的网站标题:", siteTitle);
+    if (newTitle && newTitle !== siteTitle) {
+        setLoading(true); await fetch('/api/admin/config', { method: 'POST', body: JSON.stringify({ title: newTitle }) });
+        setSiteTitle(newTitle); setLoading(false);
+    }
+  };
+
+  const deleteTagOption = (e, tagToDelete) => {
+    e.stopPropagation();
+    const currentTags = form.tags ? form.tags.split(',').filter(t => t.trim()) : [];
+    const newTags = currentTags.filter(t => t.trim() !== tagToDelete).join(',');
+    setForm({ ...form, tags: newTags });
+  };
+
+  const handleNavClick = (idx) => { setNavIdx(idx); const modes = ['folder','covered','text','gallery']; setViewMode(modes[idx]); setSelectedFolder(null); };
+
+  useEffect(() => {
+    if(view !== 'edit') return;
+    const newContent = editorBlocks.map(b => {
+      let content = b.content || '';
+      if (b.type === 'text') content = cleanAndFormat(content); 
+      if (b.type === 'note') return `\`${content}\``;
+      if (b.type === 'h1') return `# ${content}`;
+      if (b.type === 'lock') {
+          const lockHeader = b.pwd ? `:::lock ${b.pwd}` : `:::lock`; 
+          return `${lockHeader}\n\n${cleanAndFormat(content)}\n\n:::`;
+      }
+      return content;
+    }).join('\n\n'); 
+    setForm(prev => ({ ...prev, content: newContent }));
+  }, [editorBlocks]);
+
+  // 状态机解析逻辑
   const parseContentToBlocks = (md) => {
     if(!md) return [];
     const lines = md.split(/\r?\n/);
@@ -384,44 +403,37 @@ export default function AdminDashboard() {
         continue;
       }
 
-      // B. Notion 返回的 Markdown 语法 > 🔒 (正则加强)
-      // 匹配 > 🔒 **LOCK:密码**
+      // B. Notion 返回的 Markdown 语法 > 🔒
       if (!isLocking && trimmed.match(/^>\s*🔒\s*\*\*LOCK:(.*?)\*\*/)) {
         flushBuffer(); isLocking = true;
         const match = trimmed.match(/LOCK:(.*?)\*\*/);
         lockPwd = match ? match[1].trim() : '';
         continue;
       }
-      
-      // C. 结束条件加强：非引用行且非空行 -> 结束录制
       if (isLocking && !trimmed.startsWith('>') && !trimmed.startsWith(':::') && trimmed !== '') {
          isLocking = false;
          const joinedLock = lockBuffer.join('\n').trim();
          res.push({ id: Date.now() + Math.random(), type: 'lock', pwd: lockPwd, content: joinedLock });
          lockBuffer = [];
-         i--; // 回退一行重新处理
+         i--; 
          continue;
       }
 
       if (isLocking) {
         let contentLine = line;
-        // 清洗 Notion 引用前缀
         if (contentLine.startsWith('> ')) contentLine = contentLine.substring(2);
         else if (contentLine.startsWith('>')) contentLine = contentLine.substring(1);
-        
         if (contentLine.trim() === '---') continue;
         if (contentLine.trim() === '') continue;
         lockBuffer.push(contentLine);
         continue;
       }
 
-      // 普通块
       if (trimmed.startsWith('# ')) { flushBuffer(); res.push({ id: Date.now() + Math.random(), type: 'h1', content: trimmed.replace('# ', '') }); continue; }
       if (!trimmed) { flushBuffer(); continue; }
       buffer.push(line);
     }
     
-    // 收尾
     if (isLocking) {
         const joinedLock = lockBuffer.join('\n').trim();
         res.push({ id: Date.now() + Math.random(), type: 'lock', pwd: lockPwd, content: joinedLock });
@@ -436,7 +448,12 @@ export default function AdminDashboard() {
   const handleCreate = () => { setForm({ title: '', slug: 'p-'+Date.now().toString(36), excerpt:'', content:'', category:'', tags:'', cover:'', status:'Published', type: 'Post', date: new Date().toISOString().split('T')[0] }); setEditorBlocks([]); setCurrentId(null); setView('edit'); setExpandedStep(1); };
   
   const handleSave = async () => {
-    if (isDeploying) return alert("请等待更新完成...");
+    // 🟢 修复重复点击：如果正在部署中，禁止再次保存
+    if (isDeploying) {
+      alert("请等待上一次更新完成（约60秒）后再试！");
+      return;
+    }
+
     setLoading(true);
     const fullContent = editorBlocks.map(b => {
       if (b.type === 'h1') return `# ${b.content}`;
@@ -461,6 +478,7 @@ export default function AdminDashboard() {
         alert(`❌ 保存失败！\n\n错误信息:\n${d.error}`);
       } else {
         alert("✅ 保存成功！");
+        // 🟢 修复：触发更新并进入冷却
         triggerDeploy();
         setView('list');
         fetchPosts();
@@ -472,37 +490,22 @@ export default function AdminDashboard() {
     }
   };
 
-  const updateSiteTitle = async () => {
-    const newTitle = prompt("请输入新的网站标题:", siteTitle);
-    if (newTitle && newTitle !== siteTitle) {
-        setLoading(true); await fetch('/api/admin/config', { method: 'POST', body: JSON.stringify({ title: newTitle }) });
-        setSiteTitle(newTitle); setLoading(false);
-    }
-  };
-
+  // 🟢 修复：手动更新防抖逻辑 + 文案
   const triggerDeploy = async () => {
-    setIsDeploying(true);
+    setIsDeploying(true); // 锁定
     try { await fetch('/api/admin/deploy'); } catch(e) {}
+    // 60秒冷却
     setTimeout(() => setIsDeploying(false), 60000);
   };
 
-  // 🟢 修复：更新按钮只显示图标，去除文字
   const handleManualDeploy = async () => {
-     if (isDeploying) return;
+     if (isDeploying) return; // 锁定中不响应
+     
      if(confirm('确定要立即更新Blog吗？\n点击确定将立刻开始更新，在完成内容更新前请不要重复提交更新请求！')) {
         await triggerDeploy();
         alert('已触发更新！请耐心等待约 1 分钟。');
      }
   };
-
-  const deleteTagOption = (e, tagToDelete) => {
-    e.stopPropagation();
-    const currentTags = form.tags ? form.tags.split(',').filter(t => t.trim()) : [];
-    const newTags = currentTags.filter(t => t.trim() !== tagToDelete).join(',');
-    setForm({ ...form, tags: newTags });
-  };
-
-  const handleNavClick = (idx) => { setNavIdx(idx); const modes = ['folder','covered','text','gallery']; setViewMode(modes[idx]); setSelectedFolder(null); };
 
   const getFilteredPosts = () => {
      let list = posts.filter(p => {
@@ -528,7 +531,7 @@ export default function AdminDashboard() {
     <div style={{ minHeight: '100vh', background: '#303030', padding: '40px 20px' }}>
       <GlobalStyle />
       {loading && <FullScreenLoader />}
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
              {view === 'list' && <SearchInput value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />}
@@ -540,9 +543,9 @@ export default function AdminDashboard() {
            </div>
            
            <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-             {/* 🟢 修复：只保留图标 */}
+             {/* 🟢 更新按钮：状态绑定 */}
              <button onClick={handleManualDeploy} style={{background:'#424242', border: isDeploying ? '1px solid #555' : '1px solid greenyellow', opacity: isDeploying ? 0.5 : 1, padding:'10px', borderRadius:'8px', color: isDeploying ? '#888' : 'greenyellow', cursor: isDeploying ? 'not-allowed' : 'pointer'}} title="立即更新博客前端">
-               <Icons.Refresh />
+               {isDeploying ? '更新中...' : <><Icons.Refresh /> 更新博客</>}
              </button>
 
              <button onClick={() => window.open('https://pan.cloudreve.org/xxx', '_blank')} style={{background:'#a855f7', border:'none', padding:'10px 20px', borderRadius:'8px', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'5px', fontWeight:'bold', fontSize:'14px'}} className="btn-ia"><Icons.Tutorial /> 教程</button>
@@ -560,7 +563,7 @@ export default function AdminDashboard() {
             <div style={viewMode === 'gallery' || viewMode === 'folder' ? {display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:'15px'} : {}}>
               {viewMode === 'folder' && options.categories.map(cat => <div key={cat} onClick={()=>{setSelectedFolder(cat); handleNavClick(1);}} style={{padding:'15px', background:'#424242', borderRadius:'10px', display:'flex', alignItems:'center', gap:'12px', border:'1px solid #555', cursor:'pointer'}} className="btn-ia"><Icons.FolderIcon />{cat}</div>)}
               {viewMode !== 'folder' && filtered.map(p => {
-                const st = (p.status === 'Draft') ? { borderColor: '#f97316', color: '#f97316', label: '📝 草稿' } : { borderColor: 'transparent', color: 'greenyellow', label: '🚀 已发布' };
+                const st = getStatusStyle(p.status);
                 return (
                   <div key={p.id} onClick={() => handlePreview(p)} className="card-item" style={{...(viewMode === 'text' ? {display:'flex', alignItems:'center', padding:'16px 20px'} : viewMode === 'gallery' ? {display:'flex', flexDirection:'column', height:'auto'} : {}), background:'#424242', borderRadius:'12px', marginBottom:'8px', border: `1px solid ${st.borderColor}`}}>
                     {viewMode === 'covered' && <><div style={{width:'160px', flexShrink:0, background:'#303030', display:'flex', alignItems:'center', justifyContent:'center'}}>{p.cover ? <img src={p.cover} style={{width:'100%', height:'100%', objectFit:'cover'}} /> : <div style={{fontSize:'28px', color:'#444'}}>{activeTab[0]}</div>}</div><div style={{padding:'20px 35px', flex:1}}><div style={{fontWeight:'bold', fontSize:'20px', color:'#fff', marginBottom:'8px'}}>{p.title}</div><div style={{color:'#fff', fontSize:'12px', opacity:0.8, display:'flex', alignItems:'center', gap:'10px'}}><span style={{border:`1px solid ${st.color}`, color:st.color, padding:'2px 6px', borderRadius:'4px', fontSize:'10px', fontWeight:'bold'}}>{st.label}</span>{p.category} · {p.date}</div></div></>}
@@ -573,7 +576,7 @@ export default function AdminDashboard() {
             </div>
           </main>
         ) : (
-          <div style={{background: '#424242', padding: 30, borderRadius: 20}}>
+          <main style={{background:'#424242', padding:'30px', borderRadius:'20px', border:'1px solid #555'}}>
             <StepAccordion step={1} title="基础信息" isOpen={expandedStep === 1} onToggle={()=>setExpandedStep(expandedStep===1?0:1)}>
                <div style={{marginBottom:'15px'}}><label style={{display:'block', fontSize:'11px', color:'#bbb', marginBottom:'5px'}}>标题 <span style={{color: '#ff4d4f'}}>*</span></label><input className="glow-input" value={form.title} onChange={e=>setForm({...form, title:e.target.value})} placeholder="输入文章标题..." /></div>
                <div><label style={{display:'block', fontSize:'11px', color:'#bbb', marginBottom:'5px'}}>摘要</label><input className="glow-input" value={form.excerpt} onChange={e=>setForm({...form, excerpt:e.target.value})} placeholder="输入文章摘要..." /></div>
@@ -602,7 +605,7 @@ export default function AdminDashboard() {
             </div>
 
             <button onClick={handleSave} disabled={!isFormValid} style={{width:'100%', padding:'20px', background:isFormValid?'#fff':'#222', color:isFormValid?'#000':'#666', border:'none', borderRadius:'12px', fontWeight:'bold', fontSize:'16px', marginTop:'40px', cursor:isFormValid?'pointer':'not-allowed', transition:'0.3s'}}>{currentId ? '保存修改' : '确认发布'}</button>
-          </div>
+          </main>
         )}
         {previewData && <div className="modal-bg" onClick={()=>setPreviewData(null)}><div className="modal-box" onClick={e=>e.stopPropagation()}><div style={{padding:'20px 25px', borderBottom:'1px solid #333', display:'flex', justifyContent:'space-between', alignItems:'center'}}><strong>预览: {previewData.title}</strong><button onClick={()=>setPreviewData(null)} style={{background:'none', border:'none', color:'#666', fontSize:'24px', cursor:'pointer'}}>×</button></div><div className="modal-body"><NotionView blocks={previewData.rawBlocks} /></div></div></div>}
       </div>
