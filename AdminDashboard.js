@@ -1,30 +1,24 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-// ==========================================
-// 1. 图标库
-// ==========================================
+// ================= 1. 图标库 =================
 const Icons = {
   Search: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
-  CoverMode: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>,
-  TextMode: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>,
-  GridMode: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>,
-  FolderMode: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>,
-  FolderIcon: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff" style={{opacity:0.8}}><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"></path></svg>,
   Edit: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg>,
   Trash: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
-  Tutorial: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>,
-  ChevronDown: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>,
+  Settings: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
   ArrowUp: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>,
   ArrowDown: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>,
   Top: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="18 11 12 5 6 11"></polyline><polyline points="18 18 12 12 6 18"></polyline></svg>,
   Bottom: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 6 12 12 18 6"></polyline><polyline points="6 13 12 19 18 13"></polyline></svg>,
-  Settings: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+  FolderIcon: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff" style={{opacity:0.8}}><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"></path></svg>,
+  ChevronDown: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>,
+  ScrollTop: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg>,
+  ScrollBottom: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 12 16 16 12"></polyline><line x1="12" y1="8" x2="12" y2="16"></line></svg>,
+  Refresh: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
 };
 
-// ==========================================
-// 2. 样式表 (内置防止 Global CSS 报错)
-// ==========================================
+// ================= 2. 样式 & 辅助组件 =================
 const GlobalStyle = () => (
   <style dangerouslySetInnerHTML={{__html: `
     body { background-color: #303030; color: #ffffff; margin: 0; font-family: system-ui, sans-serif; overflow-x: hidden; }
@@ -60,10 +54,6 @@ const GlobalStyle = () => (
     .animated-button:hover svg { fill: #212121; }
     .animated-button:active { scale: 0.95; box-shadow: 0 0 0 4px greenyellow; }
     .animated-button:hover .circle { width: 220px; height: 220px; opacity: 1; }
-    .nav-container { position: relative; background: #202024; border-radius: 50px; padding: 5px; display: flex; align-items: center; gap: 5px; border: 1px solid #333; width: fit-content; }
-    .nav-glider { position: absolute; top: 5px; bottom: 5px; background: greenyellow; border-radius: 40px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; }
-    .nav-item { position: relative; z-index: 2; padding: 8px 16px; cursor: pointer; color: #888; transition: color 0.3s; display: flex; align-items: center; justify-content: center; width: 40px; }
-    .nav-item.active { color: #000; font-weight: bold; }
     .block-card { background: #2a2a2e; border: 1px solid #333; border-radius: 10px; padding: 15px 15px 15px 55px; margin-bottom: 12px; position: relative; transition: border 0.2s; }
     .block-card:hover { border-color: greenyellow; }
     .block-card.just-moved { animation: moveHighlight 0.6s ease-out; }
@@ -90,6 +80,9 @@ const GlobalStyle = () => (
     .input:active { transform: scale(0.95); }
     .input:focus { box-shadow: 0 0 0 2.5px #2f303d; }
     .search-icon { position: absolute; left: 1rem; fill: #bdbecb; width: 1rem; height: 1rem; pointer-events: none; z-index: 1; }
+    .fab-scroll { position: fixed; right: 30px; bottom: 30px; display: flex; flex-direction: column; gap: 10px; z-index: 99; }
+    .fab-btn { width: 45px; height: 45px; background: greenyellow; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; transition: 0.2s; }
+    .fab-btn:hover { transform: scale(1.1); box-shadow: 0 6px 16px rgba(173, 255, 47, 0.4); }
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #202024; }
     ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
@@ -97,16 +90,12 @@ const GlobalStyle = () => (
   `}} />
 );
 
-// ==========================================
-// 3. 辅助组件
-// ==========================================
 const SearchInput = ({ value, onChange }) => (
   <div className="group">
     <svg className="search-icon" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
     <input placeholder="Search" type="search" className="input" value={value} onChange={onChange} />
   </div>
 );
-
 const StepAccordion = ({ step, title, isOpen, onToggle, children }) => (
   <div>
     <div className="acc-btn" onClick={onToggle}>
@@ -116,7 +105,6 @@ const StepAccordion = ({ step, title, isOpen, onToggle, children }) => (
     <div className={`acc-content ${isOpen ? 'open' : ''}`}>{children}</div>
   </div>
 );
-
 const AnimatedBtn = ({ text, onClick, style }) => (
   <button className="animated-button" onClick={onClick} style={style}>
     <svg viewBox="0 0 24 24" className="arr-2" xmlns="http://www.w3.org/2000/svg"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>
@@ -125,7 +113,6 @@ const AnimatedBtn = ({ text, onClick, style }) => (
     <svg viewBox="0 0 24 24" className="arr-1" xmlns="http://www.w3.org/2000/svg"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>
   </button>
 );
-
 const SlidingNav = ({ activeIdx, onSelect }) => {
   const icons = [Icons.FolderMode, Icons.CoverMode, Icons.TextMode, Icons.GridMode];
   return (
@@ -135,21 +122,14 @@ const SlidingNav = ({ activeIdx, onSelect }) => {
     </div>
   );
 };
-
 const FullScreenLoader = () => (
   <div className="loader-overlay">
     <div className="loader">
-      <svg viewBox="0 0 200 60" width="200" height="60">
-        <path className="dash" fill="none" stroke="greenyellow" strokeWidth="3" d="M20,50 L20,10 L50,10 C65,10 65,30 50,30 L20,30" />
-        <path className="dash" fill="none" stroke="greenyellow" strokeWidth="3" d="M80,50 L80,10 L110,10 C125,10 125,30 110,30 L80,30 M100,30 L120,50" />
-        <path className="dash" fill="none" stroke="greenyellow" strokeWidth="3" d="M140,30 A20,20 0 1,0 180,30 A20,20 0 1,0 140,30" />
-      </svg>
+      <svg viewBox="0 0 200 60" width="200" height="60"><path className="dash" fill="none" stroke="greenyellow" strokeWidth="3" d="M20,50 L20,10 L50,10 C65,10 65,30 50,30 L20,30" /><path className="dash" fill="none" stroke="greenyellow" strokeWidth="3" d="M80,50 L80,10 L110,10 C125,10 125,30 110,30 L80,30 M100,30 L120,50" /><path className="dash" fill="none" stroke="greenyellow" strokeWidth="3" d="M140,30 A20,20 0 1,0 180,30 A20,20 0 1,0 140,30" /></svg>
     </div>
     <div className="loader-text">SYSTEM PROCESSING</div>
   </div>
 );
-
-// 工具函数：清洗 URL
 const cleanAndFormat = (input) => {
   if (!input) return "";
   try {
@@ -167,12 +147,26 @@ const cleanAndFormat = (input) => {
   } catch (e) { return input; }
 };
 
+// ================= 3. 积木编辑器 (含自动聚焦) =================
 const BlockBuilder = ({ blocks, setBlocks }) => {
   const [movingId, setMovingId] = useState(null);
-  const addBlock = (type) => setBlocks([...blocks, { id: Date.now() + Math.random(), type, content: '', pwd: '' }]);
+
+  // 辅助：滚动到指定块
+  const scrollToBlock = (id) => {
+    setTimeout(() => {
+       const el = document.getElementById(`block-${id}`);
+       if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  };
+
+  const addBlock = (type) => {
+    const newId = Date.now() + Math.random();
+    setBlocks([...blocks, { id: newId, type, content: '', pwd: '' }]);
+    scrollToBlock(newId);
+  };
   const updateBlock = (id, val, key='content') => { setBlocks(blocks.map(b => b.id === id ? { ...b, [key]: val } : b)); };
   const removeBlock = (id) => { setBlocks(blocks.filter(b => b.id !== id)); };
-  
+
   const moveBlock = (index, direction) => {
     if (direction === -1 && index === 0) return;
     if (direction === 1 && index === blocks.length - 1) return;
@@ -182,6 +176,7 @@ const BlockBuilder = ({ blocks, setBlocks }) => {
     setBlocks(newBlocks);
     setMovingId(newBlocks[targetIndex].id);
     setTimeout(() => setMovingId(null), 600);
+    scrollToBlock(newBlocks[targetIndex].id);
   };
 
   const moveToTop = (index) => {
@@ -192,6 +187,7 @@ const BlockBuilder = ({ blocks, setBlocks }) => {
     setBlocks(newBlocks);
     setMovingId(item.id);
     setTimeout(() => setMovingId(null), 600);
+    scrollToBlock(item.id);
   };
 
   const moveToBottom = (index) => {
@@ -202,6 +198,7 @@ const BlockBuilder = ({ blocks, setBlocks }) => {
     setBlocks(newBlocks);
     setMovingId(item.id);
     setTimeout(() => setMovingId(null), 600);
+    scrollToBlock(item.id);
   };
 
   const getBlockLabel = (type) => {
@@ -212,7 +209,7 @@ const BlockBuilder = ({ blocks, setBlocks }) => {
   };
   return (
     <div style={{marginTop:'30px'}}>
-      <div style={{display:'flex', gap:'15px', marginBottom:'25px', justifyContent:'center'}}>
+      <div style={{display:'flex', gap:'15px', marginBottom:'25px', justifyContent:'center', flexWrap:'wrap'}}>
           <div className="neo-btn" onClick={()=>addBlock('h1')}>H1 标题</div>
           <div className="neo-btn" onClick={()=>addBlock('text')}>📝 内容块</div>
           <div className="neo-btn" onClick={()=>addBlock('note')}>💬 注释块</div>
@@ -220,7 +217,7 @@ const BlockBuilder = ({ blocks, setBlocks }) => {
       </div>
       <div style={{display:'flex', flexDirection:'column', gap:'10px'}}>
         {blocks.map((b, index) => (
-          <div key={b.id} className={`block-card ${movingId === b.id ? 'just-moved' : ''}`}>
+          <div key={b.id} id={`block-${b.id}`} className={`block-card ${movingId === b.id ? 'just-moved' : ''}`}>
             <div className="block-left-ctrl">
                <div className="move-btn" onClick={() => moveToTop(index)} title="置顶"><Icons.Top /></div>
                <div className="move-btn" onClick={() => moveBlock(index, -1)}><Icons.ArrowUp /></div>
@@ -240,11 +237,13 @@ const BlockBuilder = ({ blocks, setBlocks }) => {
             <div className="block-del" onClick={()=>removeBlock(b.id)}><Icons.Trash /></div>
           </div>
         ))}
+        {blocks.length === 0 && <div style={{textAlign:'center', color:'#666', padding:'40px', border:'2px dashed #444', borderRadius:'12px'}}>👋 暂无内容，请点击上方按钮添加模块</div>}
       </div>
     </div>
   );
 };
 
+// ================= 4. 主组件 =================
 const NotionView = ({ blocks }) => {
   if (!blocks || !Array.isArray(blocks)) return <div style={{padding:20, color:'#666'}}>暂无预览内容</div>;
   return (
@@ -267,9 +266,6 @@ const NotionView = ({ blocks }) => {
   );
 };
 
-// ==========================================
-// 4. 主组件
-// ==========================================
 export default function AdminDashboard() {
   const [mounted, setMounted] = useState(false);
   const [view, setView] = useState('list'), [viewMode, setViewMode] = useState('covered'), [posts, setPosts] = useState([]), [options, setOptions] = useState({ categories: [], tags: [] }), [loading, setLoading] = useState(false), [activeTab, setActiveTab] = useState('Post'), [searchQuery, setSearchQuery] = useState(''), [showAllTags, setShowAllTags] = useState(false), [selectedFolder, setSelectedFolder] = useState(null), [previewData, setPreviewData] = useState(null);
@@ -296,9 +292,7 @@ export default function AdminDashboard() {
     if (view === 'edit') {
       window.history.pushState({ view: 'edit' }, '', '?mode=edit');
     } else {
-      if (window.location.search.includes('mode=edit')) {
-         window.history.back();
-      }
+      if (window.location.search.includes('mode=edit')) window.history.back();
     }
     const onPopState = () => { if (view === 'edit') setView('list'); };
     window.addEventListener('popstate', onPopState);
@@ -322,7 +316,23 @@ export default function AdminDashboard() {
 
   const handleNavClick = (idx) => { setNavIdx(idx); const modes = ['folder','covered','text','gallery']; setViewMode(modes[idx]); setSelectedFolder(null); };
 
-  // 状态机解析逻辑 (修复加密块显示问题)
+  useEffect(() => {
+    if(view !== 'edit') return;
+    const newContent = editorBlocks.map(b => {
+      let content = b.content || '';
+      if (b.type === 'text') content = cleanAndFormat(content); 
+      if (b.type === 'note') return `\`${content}\``;
+      if (b.type === 'h1') return `# ${content}`;
+      if (b.type === 'lock') {
+          const lockHeader = b.pwd ? `:::lock ${b.pwd}` : `:::lock`; 
+          return `${lockHeader}\n\n${cleanAndFormat(content)}\n\n:::`;
+      }
+      return content;
+    }).join('\n\n'); 
+    setForm(prev => ({ ...prev, content: newContent }));
+  }, [editorBlocks]);
+
+  // 状态机解析逻辑
   const parseContentToBlocks = (md) => {
     if(!md) return [];
     const lines = md.split(/\r?\n/);
@@ -342,66 +352,16 @@ export default function AdminDashboard() {
         buffer = [];
       }
     };
-
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const trimmed = line.trim();
-
-      // A. 新建时的语法 :::lock
-      if (!isLocking && trimmed.startsWith(':::lock')) {
-        flushBuffer(); isLocking = true;
-        lockPwd = trimmed.replace(':::lock', '').replace(/[>*\s🔒]/g, '').trim();
-        continue;
-      }
-      if (isLocking && trimmed === ':::') {
-        isLocking = false;
-        const joinedLock = lockBuffer.map(stripMd).join('\n').trim();
-        res.push({ id: Date.now() + Math.random(), type: 'lock', pwd: lockPwd, content: joinedLock });
-        lockBuffer = [];
-        continue;
-      }
-
-      // B. Notion 返回的 Markdown 语法 > 🔒
-      if (!isLocking && trimmed.match(/^>\s*🔒\s*\*\*LOCK:(.*?)\*\*/)) {
-        flushBuffer(); isLocking = true;
-        const match = trimmed.match(/LOCK:(.*?)\*\*/);
-        lockPwd = match ? match[1].trim() : '';
-        continue;
-      }
-      // 结束条件：非引用行且非空行
-      if (isLocking && !trimmed.startsWith('>') && !trimmed.startsWith(':::') && trimmed !== '') {
-         isLocking = false;
-         const joinedLock = lockBuffer.join('\n').trim();
-         res.push({ id: Date.now() + Math.random(), type: 'lock', pwd: lockPwd, content: joinedLock });
-         lockBuffer = [];
-         // 当前行不属于 Lock，需重新处理，回退索引
-         i--; 
-         continue;
-      }
-
-      if (isLocking) {
-        let contentLine = line;
-        if (contentLine.startsWith('> ')) contentLine = contentLine.substring(2);
-        else if (contentLine.startsWith('>')) contentLine = contentLine.substring(1);
-        if (contentLine.trim() === '---') continue;
-        if (contentLine.trim() === '') continue;
-        lockBuffer.push(contentLine);
-        continue;
-      }
-
-      // 普通块
+      const line = lines[i]; const trimmed = line.trim();
+      if (!isLocking && trimmed.startsWith(':::lock')) { flushBuffer(); isLocking = true; lockPwd = trimmed.replace(':::lock', '').replace(/[>*\s🔒]/g, '').trim(); continue; }
+      if (isLocking && trimmed === ':::') { isLocking = false; const joinedLock = lockBuffer.map(stripMd).join('\n').trim(); res.push({ id: Date.now() + Math.random(), type: 'lock', pwd: lockPwd, content: joinedLock }); lockBuffer = []; continue; }
+      if (isLocking) { lockBuffer.push(line); continue; }
       if (trimmed.startsWith('# ')) { flushBuffer(); res.push({ id: Date.now() + Math.random(), type: 'h1', content: trimmed.replace('# ', '') }); continue; }
       if (!trimmed) { flushBuffer(); continue; }
       buffer.push(line);
     }
-    
-    // 收尾
-    if (isLocking) {
-        const joinedLock = lockBuffer.join('\n').trim();
-        res.push({ id: Date.now() + Math.random(), type: 'lock', pwd: lockPwd, content: joinedLock });
-    } else {
-        flushBuffer();
-    }
+    flushBuffer();
     return res;
   };
 
@@ -434,6 +394,8 @@ export default function AdminDashboard() {
         alert(`❌ 保存失败！\n\n错误信息:\n${d.error}`);
       } else {
         alert("✅ 保存成功！");
+        // 触发自动更新 Hook (如果配置了)
+        await fetch('/api/admin/deploy'); 
         setView('list');
         fetchPosts();
       }
@@ -442,6 +404,14 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // ✅ 4. 自动更新 (Deploy Hook) 按钮逻辑
+  const handleManualDeploy = async () => {
+     if(confirm('确定要立即更新博客前端吗？\n(Vercel 将在后台开始构建，约 1 分钟后生效)')) {
+        await fetch('/api/admin/deploy');
+        alert('已触发更新！请稍后刷新博客首页。');
+     }
   };
 
   const getFilteredPosts = () => {
@@ -463,7 +433,6 @@ export default function AdminDashboard() {
   const displayTags = (options.tags && options.tags.length > 0) ? (showAllTags ? options.tags : options.tags.slice(0, 12)) : [];
 
   if (!mounted) return null;
-  const getStatusStyle = (status) => { const isDraft = status === 'Draft'; return { borderColor: isDraft ? '#f97316' : 'transparent', color: isDraft ? '#f97316' : 'greenyellow', label: isDraft ? '📝 草稿' : '🚀 已发布' }; };
 
   return (
     <div style={{ minHeight: '100vh', background: '#303030', padding: '40px 20px' }}>
@@ -478,6 +447,9 @@ export default function AdminDashboard() {
              </div>
            </div>
            <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+             {/* 🟢 4. 更新博客按钮 */}
+             <button onClick={handleManualDeploy} style={{background:'#424242', border:'1px solid #555', padding:'10px', borderRadius:'8px', color:'greenyellow', cursor:'pointer'}} title="立即更新博客前端"><Icons.Refresh /></button>
+             
              <button onClick={() => window.open('https://pan.cloudreve.org/xxx', '_blank')} style={{background:'#a855f7', border:'none', padding:'10px 20px', borderRadius:'8px', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'5px', fontWeight:'bold', fontSize:'14px'}} className="btn-ia"><Icons.Tutorial /> 教程</button>
              {view === 'list' ? <AnimatedBtn text="发布新内容" onClick={handleCreate} /> : <AnimatedBtn text="返回列表" onClick={() => setView('list')} />}
            </div>
@@ -527,6 +499,10 @@ export default function AdminDashboard() {
                </div>
             </StepAccordion>
             <BlockBuilder blocks={editorBlocks} setBlocks={setEditorBlocks} />
+            <div className="fab-scroll">
+              <div className="fab-btn" onClick={() => window.scrollTo({top:0, behavior:'smooth'})}><Icons.ArrowUp /></div>
+              <div className="fab-btn" onClick={() => window.scrollTo({top:99999, behavior:'smooth'})}><Icons.ArrowDown /></div>
+            </div>
             <button onClick={handleSave} disabled={!isFormValid} style={{width:'100%', padding:'20px', background:isFormValid?'#fff':'#222', color:isFormValid?'#000':'#666', border:'none', borderRadius:'12px', fontWeight:'bold', fontSize:'16px', marginTop:'40px', cursor:isFormValid?'pointer':'not-allowed', transition:'0.3s'}}>{currentId ? '保存修改' : '确认发布'}</button>
           </main>
         )}
