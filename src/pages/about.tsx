@@ -32,7 +32,8 @@ const About: NextPage<{
           <BlockRender blocks={blocks} />
         </div>
         <div className="mt-4">
-          <WidgetCollection widgets={widgets} />
+          {/* 增加保护：只有当 widgets 存在时才渲染 */}
+          {widgets && <WidgetCollection widgets={widgets} />}
         </div>
       </ContainerLayout>
     </>
@@ -49,20 +50,41 @@ export const getStaticProps: GetStaticProps = withNavFooterStaticProps(
       sharedPageStaticProps.props.navPages.find(
         (page) => page.slug === ABOUT
       ) ?? null
+      
+    // 获取 Blocks
     const blocks = await getAllBlocks(page?.id ?? '')
     const formattedBlocks = await formatBlocks(blocks)
 
+    // 获取 Widgets
     const blogStats = await getBlogStats()
     const widgets = await getWidgets()
     const preFormattedWidgets = await preFormatWidgets(widgets)
     const formattedWidgets = await formatWidgets(preFormattedWidgets, blogStats)
 
+    // =========================================================
+    // 🛡️ 核心修复：数据“防弹”处理 (防止因 Notion 内容缺失导致部署失败)
+    // =========================================================
+    
+    // 1. 修复 widgets.profile.links 为 undefined 导致的序列化报错
+    if (formattedWidgets && formattedWidgets.profile) {
+        // Next.js getStaticProps 不允许返回 undefined，必须转为 null
+        if (formattedWidgets.profile.links === undefined) {
+            formattedWidgets.profile.links = null;
+        }
+    }
+
+    // 2. 确保 blocks 不是 undefined
+    const safeBlocks = formattedBlocks || [];
+
+    // 3. 确保 title 不是 undefined
+    const safeTitle = page?.title ?? 'About';
+
     return {
       props: {
         ...sharedPageStaticProps.props,
-        blocks: formattedBlocks,
-        title: page?.title,
-        widgets: formattedWidgets,
+        blocks: safeBlocks,
+        title: safeTitle,
+        widgets: formattedWidgets || {}, // 确保 widgets 本身不为空对象
       },
       // revalidate: CONFIG.NEXT_REVALIDATE_SECONDS,
     }
