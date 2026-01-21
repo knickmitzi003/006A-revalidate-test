@@ -1,12 +1,9 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 
-// ⚠️ 重点检查这一行：
-// 1. 它是 ../components (两个点)
-// 2. 它是 /AdminSystem (大写 A 和 S，必须和文件夹名一致)
-// 3. 它是 /AdminDashboard (文件名)
+// ✅ 路径已修改为新的 admin-view，彻底避开大小写缓存
 const AdminComponent = dynamic(
-  () => import('../components/AdminSystem/AdminDashboard'),
+  () => import('../components/admin-view/AdminDashboard'),
   { ssr: false }
 )
 
