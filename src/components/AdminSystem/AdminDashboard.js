@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 
 // ==========================================
-// 1. 图标库 (完整版)
+// 1. 图标库
 // ==========================================
 const Icons = {
   Search: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
@@ -19,12 +19,12 @@ const Icons = {
   ArrowDown: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>,
   Top: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="18 11 12 5 6 11"></polyline><polyline points="18 18 12 12 6 18"></polyline></svg>,
   Bottom: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 6 12 12 18 6"></polyline><polyline points="6 13 12 19 18 13"></polyline></svg>,
-  Settings: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
+  Settings: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
   Refresh: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
 };
 
 // ==========================================
-// 2. 样式表 (内置)
+// 2. 样式表 (内置防止 Global CSS 报错)
 // ==========================================
 const GlobalStyle = () => (
   <style dangerouslySetInnerHTML={{__html: `
@@ -102,7 +102,7 @@ const GlobalStyle = () => (
 );
 
 // ==========================================
-// 3. 辅助组件 (必须放在主组件前)
+// 3. 辅助组件
 // ==========================================
 const SearchInput = ({ value, onChange }) => (
   <div className="group">
@@ -153,6 +153,7 @@ const FullScreenLoader = () => (
   </div>
 );
 
+// 工具函数：清洗 URL
 const cleanAndFormat = (input) => {
   if (!input) return "";
   try {
@@ -173,7 +174,7 @@ const cleanAndFormat = (input) => {
 const BlockBuilder = ({ blocks, setBlocks }) => {
   const [movingId, setMovingId] = useState(null);
 
-  // 视角锁定辅助函数
+  // 视角锁定
   const scrollToBlock = (id) => {
     setTimeout(() => {
        const el = document.getElementById(`block-${id}`);
@@ -305,10 +306,36 @@ export default function AdminDashboard() {
   async function fetchPosts() {
     setLoading(true); 
     try { 
-       const r = await fetch('/api/admin/posts'); const d = await r.json(); if (d.success) { setPosts(d.posts || []); setOptions(d.options || { categories: [], tags: [] }); }
-       const rConf = await fetch('/api/admin/config'); const dConf = await rConf.json(); if (dConf.success) setSiteTitle(dConf.siteInfo.title);
-    } finally { setLoading(false); } 
+       const r = await fetch('/api/admin/posts');
+       
+       // 🛡️ 防崩检查 1: 检查 HTTP 状态码
+       if (!r.ok) {
+         throw new Error(`API 请求失败: ${r.status} ${r.statusText}`);
+       }
+
+       // 🛡️ 防崩检查 2: 尝试解析 JSON
+       let d;
+       try { d = await r.json(); } catch(e) { throw new Error('API 返回了非 JSON 数据 (可能是 404 或 500)'); }
+
+       if (d.success) { 
+         setPosts(d.posts || []); 
+         setOptions(d.options || { categories: [], tags: [] }); 
+       } else {
+         console.error("API 逻辑错误:", d.error);
+       }
+
+       const rConf = await fetch('/api/admin/config');
+       if (rConf.ok) {
+         try { const dConf = await rConf.json(); if (dConf.success) setSiteTitle(dConf.siteInfo.title); } catch(e) {}
+       }
+    } catch (e) {
+       console.error("加载数据失败:", e);
+       // 仅在控制台报错，不弹窗打扰用户，防止登录前加载失败导致死循环弹窗
+    } finally { 
+       setLoading(false); 
+    } 
   }
+  
   useEffect(() => { if (mounted) fetchPosts(); }, [mounted]);
 
   // 后退逻辑
@@ -316,49 +343,14 @@ export default function AdminDashboard() {
     if (view === 'edit') {
       window.history.pushState({ view: 'edit' }, '', '?mode=edit');
     } else {
-      if (window.location.search.includes('mode=edit')) {
-         window.history.back();
-      }
+      if (window.location.search.includes('mode=edit')) window.history.back();
     }
     const onPopState = () => { if (view === 'edit') setView('list'); };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, [view]);
 
-  const updateSiteTitle = async () => {
-    const newTitle = prompt("请输入新的网站标题:", siteTitle);
-    if (newTitle && newTitle !== siteTitle) {
-        setLoading(true); await fetch('/api/admin/config', { method: 'POST', body: JSON.stringify({ title: newTitle }) });
-        setSiteTitle(newTitle); setLoading(false);
-    }
-  };
-
-  const deleteTagOption = (e, tagToDelete) => {
-    e.stopPropagation();
-    const currentTags = form.tags ? form.tags.split(',').filter(t => t.trim()) : [];
-    const newTags = currentTags.filter(t => t.trim() !== tagToDelete).join(',');
-    setForm({ ...form, tags: newTags });
-  };
-
-  const handleNavClick = (idx) => { setNavIdx(idx); const modes = ['folder','covered','text','gallery']; setViewMode(modes[idx]); setSelectedFolder(null); };
-
-  useEffect(() => {
-    if(view !== 'edit') return;
-    const newContent = editorBlocks.map(b => {
-      let content = b.content || '';
-      if (b.type === 'text') content = cleanAndFormat(content); 
-      if (b.type === 'note') return `\`${content}\``;
-      if (b.type === 'h1') return `# ${content}`;
-      if (b.type === 'lock') {
-          const lockHeader = b.pwd ? `:::lock ${b.pwd}` : `:::lock`; 
-          return `${lockHeader}\n\n${cleanAndFormat(content)}\n\n:::`;
-      }
-      return content;
-    }).join('\n\n'); 
-    setForm(prev => ({ ...prev, content: newContent }));
-  }, [editorBlocks]);
-
-  // 状态机解析逻辑 (修复加密块显示问题)
+  // 状态机解析逻辑
   const parseContentToBlocks = (md) => {
     if(!md) return [];
     const lines = md.split(/\r?\n/);
@@ -404,13 +396,11 @@ export default function AdminDashboard() {
         lockPwd = match ? match[1].trim() : '';
         continue;
       }
-      // 结束条件：非引用行且非空行
       if (isLocking && !trimmed.startsWith('>') && !trimmed.startsWith(':::') && trimmed !== '') {
          isLocking = false;
          const joinedLock = lockBuffer.join('\n').trim();
          res.push({ id: Date.now() + Math.random(), type: 'lock', pwd: lockPwd, content: joinedLock });
          lockBuffer = [];
-         // 当前行不属于 Lock，需重新处理，回退索引
          i--; 
          continue;
       }
@@ -425,13 +415,11 @@ export default function AdminDashboard() {
         continue;
       }
 
-      // 普通块
       if (trimmed.startsWith('# ')) { flushBuffer(); res.push({ id: Date.now() + Math.random(), type: 'h1', content: trimmed.replace('# ', '') }); continue; }
       if (!trimmed) { flushBuffer(); continue; }
       buffer.push(line);
     }
     
-    // 收尾
     if (isLocking) {
         const joinedLock = lockBuffer.join('\n').trim();
         res.push({ id: Date.now() + Math.random(), type: 'lock', pwd: lockPwd, content: joinedLock });
@@ -470,7 +458,6 @@ export default function AdminDashboard() {
         alert(`❌ 保存失败！\n\n错误信息:\n${d.error}`);
       } else {
         alert("✅ 保存成功！");
-        // 尝试触发自动更新
         try { await fetch('/api/admin/deploy'); } catch(e) {}
         setView('list');
         fetchPosts();
@@ -482,7 +469,14 @@ export default function AdminDashboard() {
     }
   };
 
-  // 手动更新博客按钮
+  const updateSiteTitle = async () => {
+    const newTitle = prompt("请输入新的网站标题:", siteTitle);
+    if (newTitle && newTitle !== siteTitle) {
+        setLoading(true); await fetch('/api/admin/config', { method: 'POST', body: JSON.stringify({ title: newTitle }) });
+        setSiteTitle(newTitle); setLoading(false);
+    }
+  };
+
   const handleManualDeploy = async () => {
      if(confirm('确定要立即更新博客前端吗？\n(Vercel 将在后台开始构建，约 1 分钟后生效)')) {
         await fetch('/api/admin/deploy');
@@ -490,6 +484,15 @@ export default function AdminDashboard() {
      }
   };
 
+  const deleteTagOption = (e, tagToDelete) => {
+    e.stopPropagation();
+    const currentTags = form.tags ? form.tags.split(',').filter(t => t.trim()) : [];
+    const newTags = currentTags.filter(t => t.trim() !== tagToDelete).join(',');
+    setForm({ ...form, tags: newTags });
+  };
+
+  const handleNavClick = (idx) => { setNavIdx(idx); const modes = ['folder','covered','text','gallery']; setViewMode(modes[idx]); setSelectedFolder(null); };
+  
   const getFilteredPosts = () => {
      let list = posts.filter(p => {
         if (activeTab === 'Page') return p.type === 'Page' && ['about', 'download'].includes(p.slug);
@@ -509,27 +512,22 @@ export default function AdminDashboard() {
   const displayTags = (options.tags && options.tags.length > 0) ? (showAllTags ? options.tags : options.tags.slice(0, 12)) : [];
 
   if (!mounted) return null;
+  const getStatusStyle = (status) => { const isDraft = status === 'Draft'; return { borderColor: isDraft ? '#f97316' : 'transparent', color: isDraft ? '#f97316' : 'greenyellow', label: isDraft ? '📝 草稿' : '🚀 已发布' }; };
 
   return (
     <div style={{ minHeight: '100vh', background: '#303030', padding: '40px 20px' }}>
       <GlobalStyle />
       {loading && <FullScreenLoader />}
-      
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
              {view === 'list' && <SearchInput value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />}
              <div style={{display:'flex', flexDirection:'column', justifyContent:'center'}}>
-                <div style={{ fontSize: '24px', fontWeight: '900', letterSpacing: '1px', display:'flex', alignItems:'center', gap:'10px' }}>
-                   {siteTitle} <span onClick={updateSiteTitle} style={{cursor:'pointer', opacity:0.5}} title="修改网站标题"><Icons.Settings /></span>
-                </div>
+                <div style={{ fontSize: '24px', fontWeight: '900', letterSpacing: '1px', display:'flex', alignItems:'center', gap:'10px' }}>{siteTitle} <span onClick={updateSiteTitle} style={{cursor:'pointer', opacity:0.5}} title="修改网站标题"><Icons.Settings /></span></div>
              </div>
            </div>
-           
            <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-             {/* 更新博客按钮 */}
              <button onClick={handleManualDeploy} style={{background:'#424242', border:'1px solid #555', padding:'10px', borderRadius:'8px', color:'greenyellow', cursor:'pointer'}} title="立即更新博客前端"><Icons.Refresh /></button>
-
              <button onClick={() => window.open('https://pan.cloudreve.org/xxx', '_blank')} style={{background:'#a855f7', border:'none', padding:'10px 20px', borderRadius:'8px', color:'#fff', cursor:'pointer', display:'flex', alignItems:'center', gap:'5px', fontWeight:'bold', fontSize:'14px'}} className="btn-ia"><Icons.Tutorial /> 教程</button>
              {view === 'list' ? <AnimatedBtn text="发布新内容" onClick={handleCreate} /> : <AnimatedBtn text="返回列表" onClick={() => setView('list')} />}
            </div>
@@ -541,7 +539,6 @@ export default function AdminDashboard() {
                <div style={{background:'#424242', padding:'5px', borderRadius:'12px', display:'flex'}}>{['Post', 'Widget', 'Page'].map(t => <button key={t} onClick={() => { setActiveTab(t); setSelectedFolder(null); }} style={activeTab === t ? {padding:'8px 20px', border:'none', background:'#555', color:'#fff', borderRadius:'10px', fontWeight:'bold', fontSize:'13px', cursor:'pointer'} : {padding:'8px 20px', border:'none', background:'none', color:'#888', borderRadius:'10px', fontWeight:'bold', fontSize:'13px', cursor:'pointer'}}>{t === 'Page' ? '自定义页面' : t === 'Post' ? '已发布' : '组件'}</button>)}</div>
                <SlidingNav activeIdx={navIdx} onSelect={handleNavClick} />
             </div>
-            
             <div style={viewMode === 'gallery' || viewMode === 'folder' ? {display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:'15px'} : {}}>
               {viewMode === 'folder' && options.categories.map(cat => <div key={cat} onClick={()=>{setSelectedFolder(cat); handleNavClick(1);}} style={{padding:'15px', background:'#424242', borderRadius:'10px', display:'flex', alignItems:'center', gap:'12px', border:'1px solid #555', cursor:'pointer'}} className="btn-ia"><Icons.FolderIcon />{cat}</div>)}
               {viewMode !== 'folder' && filtered.map(p => {
